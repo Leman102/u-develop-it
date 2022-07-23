@@ -31,9 +31,38 @@ const db = mysql.createConnection(
 );
 
 //query the database to test the connection
-db.query('SELECT * FROM candidates', (err, rows) => {
-    console.log(rows);
-});
+// db.query('SELECT * FROM candidates', (err, rows) => {
+//     console.log(rows);
+// });
+
+// GET a single candidate
+// db.query(`SELECT * FROM candidates WHERE id =1`, (err, row) => {
+//     if(err){
+//         console.log(err);
+//     }
+//     console.log(row);
+// });
+
+//Delete a canddiate (the question mark (?) denotes a placeholder)
+//after the ?, we define the target value
+// db.query(`DELETE FROM candidates WHERE id = ?`,1, (err,result) => {
+//     if (err) {
+//         console.log(err);
+//     }
+//     console.log(result);
+// });
+
+//create a candidate
+// const sql = `INSERT INTO candidates (id, first_name,last_name,industry_connected)
+//                 VALUES (?,?,?,?)`;
+// const params = [1,'Ronald','Firbank',1];
+
+// db.query(sql,params,(err, result) => {
+//     if (err) {
+//         console.log(err);
+//     }
+//     console.log(result);
+// });
 
 //create catchall route to Default response for any other request (Not Found)
 app.use((req, res) => {
