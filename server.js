@@ -1,9 +1,12 @@
 const express = require('express');
 //import mysql2 package
-const mysql = require('mysql2');
+//const mysql = require('mysql2');//MOVE to connection file import db module
+const db = require('./db/connection');
 //import inputCheck module (function)
 const inputCheck = require('./utils/inputCheck');
 
+//Add API routes
+const apiRoutes = require('./routes/apiRoutes');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -12,6 +15,9 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
+//Use apiRoutes
+app.use('/api', apiRoutes);
+
 //get test route
 // app.get('/', (req,res) => {
 //     res.json({
@@ -19,7 +25,9 @@ app.use(express.json());
 //     });
 // });
 
+//MOVE to connections file
 //connect to database
+/*
 const db = mysql.createConnection(
     {
         host: 'localhost',
@@ -31,12 +39,16 @@ const db = mysql.createConnection(
     },
     console.log('Connected to the election database')
 );
+*/
 
 //query the database to test the connection get all candidates
 // db.query('SELECT * FROM candidates', (err, rows) => {
 //     console.log(rows);
 // });
 
+
+/*
+Transfer to candidateRoutes
 //GET all Candidates
 //api in the URL signifies that this is an API endpoint.
 app.get('/api/candidates', (req,res) => {
@@ -185,65 +197,26 @@ app.put('/api/candidate/:id', (req, res) => {
       }
     });
 });
+Close the comment candidates
+*/
 
-//GET parties API route => all parties
-app.get('/api/parties', (req, res) => {
-    const sql = `SELECT * FROM parties`;
-    db.query(sql, (err, rows) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      res.json({
-        message: 'success',
-        data: rows
-      });
-    });
-  });
-
-//GET a single party
-app.get('/api/party/:id', (req, res) => {
-    const sql = `SELECT * FROM parties WHERE id = ?`;
-    const params = [req.params.id];
-    db.query(sql, params, (err, row) => {
-      if (err) {
-        res.status(400).json({ error: err.message });
-        return;
-      }
-      res.json({
-        message: 'success',
-        data: row
-      });
-    });
-});
-
-//DELETE party route
-app.delete('/api/party/:id', (req, res) => {
-    const sql = `DELETE FROM parties WHERE id = ?`;
-    const params = [req.params.id];
-    db.query(sql, params, (err, result) => {
-      if (err) {
-        res.status(400).json({ error: res.message });
-        // checks if anything was deleted
-      } else if (!result.affectedRows) {
-        res.json({
-          message: 'Party not found'
-        });
-      } else {
-        res.json({
-          message: 'deleted',
-          changes: result.affectedRows,
-          id: req.params.id
-        });
-      }
-    });
-});
+//Party API transferred to partyRoutes file
 
 //create catchall route to Default response for any other request (Not Found)
 app.use((req, res) => {
     res.status(404).end();
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on  ${PORT}`);
+
+// app.listen(PORT, () => {
+//     console.log(`Server running on  ${PORT}`);
+// });
+
+// Start server after DB connection
+db.connect(err => {
+    if (err) throw err;
+    console.log('Database connected.');
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
 });
